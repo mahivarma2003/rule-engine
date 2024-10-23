@@ -1,21 +1,39 @@
-# rule-engine
-# Rule Engine with Abstract Syntax Tree (AST)
+#Rule Engine - README
+#Overview
+This Rule Engine application allows users to create, modify, evaluate, and combine custom rules based on user attributes such as age, department, salary, and experience. The rule system uses Abstract Syntax Trees (AST) to represent and evaluate logical expressions.
 
-## Project Overview
-This project is a simple 3-tier rule engine application designed to determine user eligibility based on attributes such as age, department, income, and spend. The system represents conditional rules using an Abstract Syntax Tree (AST) and supports the dynamic creation, combination, and evaluation of rules.
+This document provides a comprehensive guide on how to set up, run, and interact with the application, including the backend server built using Node.js and MongoDB, and the frontend built with HTML, CSS (Bootstrap), and JavaScript.
 
-## Features
-- **Rule Creation**: Create individual rules that can represent conditions like age, department, and income using an AST structure.
-- **Rule Combination**: Combine multiple rules into a single AST for more complex evaluations.
-- **Rule Evaluation**: Evaluate rules against user data to determine eligibility.
-- **Dynamic Rule Modification**: Allows modification of existing rules, including operators and conditions.
-- **Error Handling**: Validates rule strings and input data to ensure correct processing.
-
-## Technologies Used
-- **Backend**: Node.js for rule engine processing.
-- **Database**: MongoDB for storing rules and application metadata.
-- **Frontend**: HTML, CSS, JavaScript for UI to create, view, and modify rules.
-- **Others**: Docker for containerization.
+##Features
+Create Rules: Define rules using attributes and logical operators.
+Evaluate Rules: Apply rules to user data to determine eligibility.
+Modify Rules: Update existing rules and their logic.
+Combine Rules: Merge multiple rules into a single AST with logical operators.
+Real-Time Rule Evaluation: Rules are evaluated dynamically based on inputs.
+##Application Design
+###Backend:
+Node.js: Provides RESTful API endpoints to manage and evaluate rules.
+MongoDB: Stores rule data, including the rule string and its AST.
+Abstract Syntax Tree (AST): Used for parsing and evaluating rule strings.
+Mongoose: MongoDB ORM for schema-based data management.
+###Frontend:
+HTML/CSS/Bootstrap: User interface for interacting with the rule engine.
+JavaScript: Handles form submissions and interactions with the backend API.
+Dependencies
+Backend:
+Node.js: Backend runtime environment.
+Express.js: Web framework for handling routes and requests.
+MongoDB: Database used for storing rules.
+Mongoose: MongoDB ORM for data schema and validation.
+Cors: Middleware for Cross-Origin Resource Sharing.
+Body-parser: Middleware to parse incoming request bodies in a middleware before your handlers.
+Dotenv: For environment variable management.
+Frontend:
+Bootstrap: UI styling and responsive design.
+JavaScript: Logic for managing interactions with backend API.
+###Prerequisites
+Node.js: Version 14 or later.
+MongoDB: A MongoDB instance of running locally
 
 ## Data Structure
 
