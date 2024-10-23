@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rule Engine</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Rule Engine</h1>
+
+        <!-- Create Rule Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Create Rule</h3>
+            </div>
+            <div class="card-body">
+                <form id="ruleForm" class="row g-3">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" id="ruleName" placeholder="Rule Name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" id="ruleString" placeholder="Enter Rule (e.g. age > 30 AND department = 'Sales')" required>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Create Rule</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Evaluate Rule Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Evaluate Rule</h3>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <select class="form-select" id="ruleSelect"></select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="number" class="form-control" id="age" placeholder="Age">
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="department" placeholder="Department">
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <input type="number" class="form-control" id="salary" placeholder="Salary">
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <input type="number" class="form-control" id="experience" placeholder="Experience">
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <button class="btn btn-success" id="evaluateBtn">Evaluate Rule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modify Rule Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Modify Rule</h3>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <select class="form-select" id="modifyRuleSelect"></select>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" id="updatedRuleString" placeholder="Updated Rule String">
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-warning" id="modifyRuleBtn">Modify Rule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Combine Rules Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Combine Rules</h3>
+            </div>
+            <div class="card-body">
+                <form id="combineRuleForm" class="row g-3">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" id="combineRuleName" placeholder="Combine Rule Name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <textarea class="form-control" id="combineRuleString" rows="3" placeholder="Enter multiple rules separated by new lines (e.g. age > 30 AND department = 'Sales')"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Combine Rules</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3001'; // Adjust if your server is on a different port
+
+        // Load rules into dropdown
+        function loadRules() {
+            fetch(`${API_BASE_URL}/rules`)
+                .then(response => response.json())
+                .then(rules => {
+                    const ruleSelect = document.getElementById('ruleSelect');
+                    const modifyRuleSelect = document.getElementById('modifyRuleSelect');
+                    ruleSelect.innerHTML = '';
+                    modifyRuleSelect.innerHTML = '';
+                    rules.forEach(rule => {
+                        const option = document.createElement('option');
+                        option.value = rule._id;
+                        option.text = rule.name;
+                        ruleSelect.appendChild(option);
+                        modifyRuleSelect.appendChild(option.cloneNode(true));
+                    });
+                });
+        }
+
+        // Submit new rule
+        document.getElementById('ruleForm').onsubmit = function (e) {
+            e.preventDefault();
+            const ruleName = document.getElementById('ruleName').value;
+            const ruleString = document.getElementById('ruleString').value;
+
+            fetch(`${API_BASE_URL}/create-rule`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: ruleName,
+                    rule_string: ruleString
+                }),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.error) });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('Rule Created: ' + data.rule.name);
+                    document.getElementById('ruleName').value = ""; // Clear the input
+                    document.getElementById('ruleString').value = ""; // Clear the input
+                    loadRules();
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+        };
+
+        // Evaluate rule
+        document.getElementById('evaluateBtn').onclick = function () {
+            const ruleId = document.getElementById('ruleSelect').value;
+            const age = document.getElementById('age').value;
+            const department = document.getElementById('department').value;
+            const salary = document.getElementById('salary').value;
+            const experience = document.getElementById('experience').value;
+
+            fetch(`${API_BASE_URL}/evaluate-rule`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ruleId: ruleId,
+                    data: { age: Number(age), department, salary: Number(salary), experience: Number(experience) }
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Evaluation Result: ' + data.result);
+                    document.getElementById('age').value = ""; // Clear the input
+                    document.getElementById('department').value = ""; // Clear the input
+                    document.getElementById('salary').value = ""; // Clear the input
+                    document.getElementById('experience').value = ""; // Clear the input
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+        };
+
+        // Modify existing rule
+        document.getElementById('modifyRuleBtn').onclick = function () {
+            const ruleId = document.getElementById('modifyRuleSelect').value;
+            const updatedRuleString = document.getElementById('updatedRuleString').value;
+
+            fetch(`${API_BASE_URL}/modify-rule/${ruleId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    updatedRuleString: updatedRuleString
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Rule Modified: ' + data.rule.name);
+                    loadRules();
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+        };
+
+        // Combine Rules
+        document.getElementById('combineRuleForm').onsubmit = function (e) {
+            e.preventDefault();
+            const ruleName = document.getElementById('combineRuleName').value;
+            const combineRuleString = document.getElementById('combineRuleString').value.split('\n').filter(Boolean);
+
+            fetch(`${API_BASE_URL}/combine-rules`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: ruleName,
+                    rules: combineRuleString
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Combined Rule AST Created: ' + data.rule.name);
+                    document.getElementById('combineRuleName').value = ""; // Clear the input
+                    document.getElementById('combineRuleString').value = ""; // Clear the input
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+        };
+
+        // Load rules on page load
+        window.onload = function () {
+            loadRules();
+        };
+    </script>
+</body>
+</html>
