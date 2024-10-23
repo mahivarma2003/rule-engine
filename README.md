@@ -1,156 +1,145 @@
-#Rule Engine Application
+# Rule Engine Application
+
+This project is a rule engine that allows users to create, modify, evaluate, and combine rules using an Abstract Syntax Tree (AST). The rules are stored in a MongoDB database and can be dynamically evaluated based on user inputs such as age, department, salary, and experience. The system supports complex rule combinations using logical operators like `AND`, `OR`, and comparisons such as `>`, `<`, `=`, `!=`, etc.
+
+## Features
+
+- Create rules dynamically based on user input.
+- Evaluate rules by passing user attributes such as age, department, salary, and experience.
+- Modify existing rules.
+- Combine multiple rules into a single rule with an AST representation.
+- All rules are stored in a MongoDB database.
+- Frontend interface to interact with the rule engine.
+
+## Technology Stack
+
+- **Frontend**: HTML, CSS, JavaScript, Bootstrap
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB (via Mongoose)
+- **Environment Variables**: `dotenv` for managing sensitive configuration like database credentials
+
+## Dependencies
+
+### Backend Dependencies
+
+- **Node.js**: Ensure Node.js is installed.
+- **Express.js**: Web framework for Node.js.
+- **Mongoose**: For MongoDB object modeling.
+- **dotenv**: To manage environment variables.
+- **body-parser**: Middleware to handle JSON request bodies.
+- **cors**: Middleware to enable Cross-Origin Resource Sharing.
+
+### Frontend Dependencies
+
+- **Bootstrap**: A CSS framework to design the UI.
+- **JavaScript**: For client-side interactivity.
+
+## Setup Instructions
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/rule-engine.git
+cd rule-engine
 
 
-This Rule Engine application allows users to create, evaluate, modify, and combine dynamic rules based on various attributes like age, department, salary, and experience. The application is built using Node.js, Express, and MongoDB for the backend, and a frontend powered by HTML, CSS, JavaScript, and Bootstrap.
+2. Install dependencies
+Make sure you have Node.js and MongoDB installed. Then, run the following command:
 
-Table of Contents
-Features
-Technologies Used
-Prerequisites
-Setup and Installation
-Environment Variables
-API Endpoints
-Usage
-Docker Instructions
-Design Choices
-Features
-Create Rules: Define rules using attributes like age, department, salary, etc., and save them in the database.
-Evaluate Rules: Evaluate a rule using user-provided data (attributes) to see if the conditions hold.
-Modify Rules: Update existing rules in the database.
-Combine Rules: Combine multiple rules using the AND operator.
-View All Rules: Retrieve all the existing rules in the system.
-Technologies Used
-Frontend: HTML, CSS, JavaScript, Bootstrap
-Backend: Node.js, Express
-Database: MongoDB
-AST Parsing: Custom-built AST parser for rule processing
-Prerequisites
-Node.js: Make sure Node.js is installed on your machine. You can download it from here.
-MongoDB: MongoDB should be installed or accessible as a cloud instance (e.g., MongoDB Atlas).
-Docker (Optional): If you want to run the services inside containers, Docker is required.
-Setup and Installation
-1. Clone the Repository
-bash
-Copy code
-git clone https://github.com/your-username/rule-engine-app.git
-cd rule-engine-app
-2. Install Dependencies
 bash
 Copy code
 npm install
-3. Set Up MongoDB
-You can either use a local instance of MongoDB or set up a free cloud-based MongoDB database using MongoDB Atlas.
+3. Configure environment variables
+Create a .env file in the project root and add the following environment variables:
 
-If you're using a local MongoDB instance, ensure that MongoDB is installed and running.
-For a cloud-based MongoDB instance, sign up on MongoDB Atlas and create a new database.
-4. Set Up Environment Variables
-Create a .env file in the root of your project and add the following:
+makefile
+Copy code
+EMAIL=<your-mongodb-username>
+PASSWORD=<your-mongodb-password>
+HOST=<your-mongodb-host>
+DATABASE=<your-database-name>
+PORT=3001
+4. Start MongoDB
+If MongoDB is not installed locally, you can set it up using Docker. Run the following command to start a MongoDB container:
 
 bash
 Copy code
-EMAIL=your_email_for_mongodb
-PASSWORD=your_mongodb_password
-HOST=your_mongodb_cluster_host
-DATABASE=your_database_name
-PORT=3001 # or any port you'd prefer
-5. Run the Application
+docker run --name rule-engine-mongo -p 27017:27017 -d mongo
+5. Start the server
+Once MongoDB is up, start the Node.js server:
+
 bash
 Copy code
 npm start
-The server will run at http://localhost:3001.
+The server will be running on http://localhost:3001.
 
-Environment Variables
-Ensure you configure the following environment variables in your .env file:
+6. Access the Application
+Open index.html in your browser to access the frontend.
 
-EMAIL: MongoDB Atlas cluster user email.
-PASSWORD: Password for MongoDB Atlas cluster.
-HOST: Host for MongoDB cluster (e.g., cluster0.mongodb.net).
-DATABASE: MongoDB database name.
-PORT: Port where the server will run.
 API Endpoints
-1. Create a Rule
+1. Create Rule
 POST /create-rule
+
 Request Body:
+
 json
 Copy code
 {
-  "name": "Rule Name",
+  "name": "Rule1",
   "rule_string": "age > 30 AND department = 'Sales'"
 }
-Response:
-json
-Copy code
-{
-  "rule": {
-    "_id": "rule_id",
-    "name": "Rule Name",
-    "rule_string": "age > 30 AND department = 'Sales'",
-    "ast": { ... },
-    "createdAt": "2024-10-23T...",
-    "updatedAt": "2024-10-23T..."
-  }
-}
-2. Evaluate a Rule
+2. Evaluate Rule
 POST /evaluate-rule
+
 Request Body:
+
 json
 Copy code
 {
-  "ruleId": "rule_id",
+  "ruleId": "605c2f8f49adf61060b1b5b2",
   "data": {
-    "age": 35,
+    "age": 32,
     "department": "Sales",
     "salary": 50000,
     "experience": 5
   }
 }
-Response:
-json
-Copy code
-{
-  "result": true
-}
-3. Modify a Rule
+3. Modify Rule
 PUT /modify-rule/:ruleId
+
 Request Body:
+
 json
 Copy code
 {
-  "updatedRuleString": "age > 40 AND department = 'Marketing'"
+  "updatedRuleString": "age > 35 AND department = 'HR'"
 }
 4. Combine Rules
 POST /combine-rules
+
 Request Body:
+
 json
 Copy code
 {
-  "name": "Combined Rule",
+  "name": "CombinedRule1",
   "rules": [
     "age > 30 AND department = 'Sales'",
-    "salary > 50000"
+    "salary >= 50000"
   ]
 }
 5. Get All Rules
 GET /rules
+
 Response:
+
 json
 Copy code
 [
   {
-    "_id": "rule_id",
-    "name": "Rule Name",
+    "_id": "605c2f8f49adf61060b1b5b2",
+    "name": "Rule1",
     "rule_string": "age > 30 AND department = 'Sales'",
-    "ast": { ... },
-    "createdAt": "2024-10-23T...",
-    "updatedAt": "2024-10-23T..."
-  },
-  ...
+    "ast": {...}
+  }
 ]
-Usage
-Frontend Interface
-Open your browser and navigate to http://localhost:3001/index.html.
-Use the interface to:
-Create rules using the "Create Rule" form.
-Evaluate rules by selecting a rule and providing attribute data.
-Modify existing rules.
-Combine multiple rules into one.
